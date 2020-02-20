@@ -1,0 +1,3 @@
+whitelistObjectNames: ["jvm*:*", "jmx*:*", "process*:*"]
+rules:
+  - pattern: ".*"
