@@ -85,7 +85,7 @@ curl http://localhost:8080/echostatus/403
 
   Start Listening on a random local port and open 5000 connections to that port
 
- - `directmemoryleak`
+- `directmemoryleak`
 
   Start allocating direct memory until error.
 
