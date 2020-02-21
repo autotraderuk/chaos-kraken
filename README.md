@@ -28,7 +28,7 @@ Send a `POST` request to your desired failure e.g.
 curl -X POST http://localhost:8080/simulate/memoryleak`
 ```
 
-To have Monkeynetes return a desired status code, send a `GET` request to `/echostatus/{CODE}` e.g. 
+To return a desired status code, send a `GET` request to `/echostatus/{CODE}` e.g. 
 
 ```bash
 curl http://localhost:8080/echostatus/403
