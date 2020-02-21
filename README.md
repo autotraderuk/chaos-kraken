@@ -1,15 +1,14 @@
-# Monkeynetes
+# Chaos Kraken
 
 Application to simulate JVM based failure scenarios when running on a delivery platform.
 
-The first version of Monkeynetes was created at [Auto Trader UK](https://careers.autotrader.co.uk/) back in 2017. It was originally 
-known as the Chaos Kraken with the tag line...
-
 > Terrorise the Shipp'ng lanes with the Chaos Kraken, an incomplete FAAS (Failures as a Service).  
 
-As Auto Trader started their migration to public cloud and Kubernetes, the Chaos Kraken evolved into what is now known as Monkeynetes.
+The first version of Chaos Kraken was created at [Auto Trader UK](https://careers.autotrader.co.uk/) back in 2017. It was originally built to test various application failure conditions on their private cloud infrastructure.
 
-Monkeynetes is used within Auto Trader to verify various behaviours of their [GKE](https://cloud.google.com/kubernetes-engine) based delivery platform. 
+As Auto Trader started their migration to public cloud and Kubernetes, the Chaos Kraken evolved to cater for more failure modes.
+
+Chaos Kraken is actively used within Auto Trader to verify various behaviours of their [GKE](https://cloud.google.com/kubernetes-engine) based delivery platform. 
 
 ## Usage
 
