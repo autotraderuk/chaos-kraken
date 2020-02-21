@@ -14,6 +14,6 @@ constructor() {
 
     @GetMapping
     fun hello(): ResponseEntity<String> {
-        return ResponseEntity.ok("This monkey is running and ready to cause some chaos.")
+        return ResponseEntity.ok("This kraken is running and ready to cause some chaos.")
     }
 }
