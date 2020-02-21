@@ -9,6 +9,8 @@ known as the Chaos Kraken with the tag line...
 
 As Auto Trader started their migration to public cloud and Kubernetes, the Chaos Kraken evolved into what is now known as Monkeynetes.
 
+Monkeynetes is used within Auto Trader to verify various behaviours of their [GKE](https://cloud.google.com/kubernetes-engine) based delivery platform. 
+
 ## Usage
 
 ### Start-up
