@@ -54,7 +54,7 @@ FAIL_ON_START=killapp ./gradlew clean bootRun
 Send a `POST` request to your desired failure e.g. 
 
 ```shell script
-curl -X POST http://localhost:8080/simulate/memoryleak`
+curl -X POST http://localhost:8080/simulate/memoryleak
 ```
 
 To return a desired status code, send a `GET` request to `/echostatus/{CODE}` e.g. 
