@@ -7,6 +7,7 @@ import javax.annotation.PostConstruct
 
 @SpringBootApplication
 class Application
+
 @Autowired
 constructor(private val failureSimulator: FailureSimulator) {
     @PostConstruct
