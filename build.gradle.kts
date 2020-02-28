@@ -17,7 +17,6 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("javax.validation:validation-api:2.0.1.Final")
     implementation("org.apache.commons:commons-lang3:3.4")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 

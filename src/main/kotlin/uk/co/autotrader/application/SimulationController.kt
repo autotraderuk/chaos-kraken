@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/simulate")
 @Timed
 class SimulationController
+
 @Autowired
 constructor(private var failureSimulator: FailureSimulator) {
 
