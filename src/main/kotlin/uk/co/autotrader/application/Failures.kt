@@ -2,7 +2,6 @@ package uk.co.autotrader.application
 
 import org.apache.commons.lang3.RandomUtils
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.co.autotrader.application.WriteRandomBytesToFile.writeRandomBytesToFile
 import java.io.*
@@ -29,12 +28,10 @@ interface Failure {
 private val LOG = LoggerFactory.getLogger(FailureSimulator::class.java)
 
 @Component
-class FailureSimulator
+class FailureSimulator(private val failures: Map<String, Failure>) {
 
-@Autowired
-constructor(private val failures: Map<String, Failure>) {
     fun run(type: String?, params: Map<String, String> = emptyMap()): Boolean {
-        if (type != null) {
+        if (!type.isNullOrBlank()) {
             val failure: Failure? = failures[type]
             return if (failure == null) {
                 LOG.error("Unknown failure '{}'", type)

@@ -33,12 +33,6 @@ class SimulationControllerShould(@Autowired val restTemplate: TestRestTemplate) 
     }
 
     @Test
-    fun `echo status code`() {
-        val response = restTemplate.getForEntity("/echostatus/418", String::class.java)
-        assertThat(response.statusCode, equalTo(HttpStatus.I_AM_A_TEAPOT))
-    }
-
-    @Test
     fun `delegate to specific failure type`() {
         val response = restTemplate.postForEntity("/simulate/custom", emptyRequestBody, String::class.java)
         assertThat(response.statusCode, equalTo(HttpStatus.OK))

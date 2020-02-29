@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/simulate")
 @Timed
-class SimulationController(private var failureSimulator: FailureSimulator) {
+class SimulationController(private val failureSimulator: FailureSimulator) {
 
     @PostMapping("/{failureName}")
     fun simulateFailure(@PathVariable failureName: String, @RequestParam params: Map<String, String>): ResponseEntity<String> {
