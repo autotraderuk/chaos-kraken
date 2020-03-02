@@ -2,7 +2,6 @@ package uk.co.autotrader.application
 
 import org.apache.commons.lang3.RandomUtils
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.co.autotrader.application.WriteRandomBytesToFile.writeRandomBytesToFile
 import java.io.*
@@ -13,11 +12,8 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
-import java.time.Instant
 import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatter.ISO_INSTANT
 import java.util.*
 import java.util.stream.Collectors
 import java.util.stream.IntStream
@@ -26,19 +22,16 @@ import kotlin.concurrent.timer
 import kotlin.system.exitProcess
 
 interface Failure {
-
     fun fail(params: Map<String, String> = emptyMap())
 }
 
 private val LOG = LoggerFactory.getLogger(FailureSimulator::class.java)
 
 @Component
-class FailureSimulator
+class FailureSimulator(private val failures: Map<String, Failure>) {
 
-@Autowired
-constructor(private val failures: Map<String, Failure>) {
     fun run(type: String?, params: Map<String, String> = emptyMap()): Boolean {
-        if (type != null) {
+        if (!type.isNullOrBlank()) {
             val failure: Failure? = failures[type]
             return if (failure == null) {
                 LOG.error("Unknown failure '{}'", type)

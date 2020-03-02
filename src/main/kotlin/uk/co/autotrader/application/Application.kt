@@ -1,12 +1,13 @@
 package uk.co.autotrader.application
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.runApplication
 import javax.annotation.PostConstruct
 
 @SpringBootApplication
 class Application
+
 @Autowired
 constructor(private val failureSimulator: FailureSimulator) {
     @PostConstruct
@@ -17,5 +18,5 @@ constructor(private val failureSimulator: FailureSimulator) {
 }
 
 fun main(args: Array<String>) {
-    SpringApplication.run(Application::class.java, *args)
+    runApplication<Application>(*args)
 }
