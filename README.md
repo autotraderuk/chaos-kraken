@@ -10,9 +10,9 @@ As Auto Trader started their migration to public cloud and Kubernetes, the Chaos
 
 Chaos Kraken is actively used within Auto Trader to verify various behaviours of their [GKE](https://cloud.google.com/kubernetes-engine) based delivery platform. 
 
-![Build](https://github.com/autotraderuk/chaos-kraken/workflows/Build/badge.svg?branch=master)
-
 ## Build
+
+![Build](https://github.com/autotraderuk/chaos-kraken/workflows/Build/badge.svg?branch=master)
 
 ### Standalone
 
