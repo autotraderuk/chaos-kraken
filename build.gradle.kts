@@ -46,8 +46,8 @@ tasks.withType<KotlinCompile>() {
 
 publishing {
     publications {
-        create<MavenPublication>("default") {
-            from(components["java"])
+        create<MavenPublication>("bootJava") {
+            artifact(tasks.getByName("bootJar"))
         }
     }
 
