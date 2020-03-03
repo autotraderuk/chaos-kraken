@@ -21,7 +21,6 @@ java -jar chaos-kraken-0.1.2.jar
 ```
 
 ![Alt text](./chaos-kraken-usage.svg)
-<img src="./chaos-kraken-usage.svg">
 
 ## Build
 
