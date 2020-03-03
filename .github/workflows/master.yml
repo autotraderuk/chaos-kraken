@@ -24,3 +24,9 @@ jobs:
 
     - name: Build with Gradle
       run: ./gradlew build
+
+    - name: Upload build artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: chaos-kraken.jar
+          path: build/libs/chaos-kraken-0.0.1-SNAPSHOT.jar
