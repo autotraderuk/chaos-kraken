@@ -22,54 +22,15 @@ java -jar chaos-kraken-0.1.2.jar
 
 ![Alt text](./chaos-kraken-usage.svg)
 
-## Build
+### Start-up failures
 
-![Build](https://github.com/autotraderuk/chaos-kraken/workflows/Build/badge.svg?branch=master)
-
-### Standalone
-
-As the project is based on Gradle and SpringBoot, you can get started quickly by running:
-
-```shell script
-./gradlew bootRun 
-```
-
-The app will be available at http://localhost:8080
-
-Alternatively to build an executable JAR run:
-
-```shell script
-./gradlew build
-```
-
-### Docker
-
-A [`Dockerfile`](Dockerfile) is provided to demonstrate how you may containerise the app for deployment to a platform such as Kubernetes. 
-A [`docker-compose.yaml`](docker-compose.yml) file is also provided for convenience.  
-
-To build the image you can run:
-
-```shell script
-docker-compose build
-```
-
-To spin up the app locally run the following:
-
-```shell script
-docker-compose up
-``` 
-
-## Usage
-
-### Start-up
-
-Simply set the `FAIL_ON_START` environment variable to one of the failure types. 
+Set the `FAIL_ON_START` environment variable to one of the failure types. 
 
  ```shell script
 FAIL_ON_START=killapp ./gradlew clean bootRun 
 ```
 
-### Runtime
+### Runtime failures
 
 Send a `POST` request to your desired failure e.g. 
 
@@ -83,7 +44,7 @@ To return a desired status code, send a `GET` request to `/echostatus/{CODE}` e.
 curl http://localhost:8080/echostatus/403
 ```
 
-## Failures
+## Failure types
 
 - `toggle-service-health`
 
@@ -140,3 +101,40 @@ curl http://localhost:8080/echostatus/403
   Start allocating direct memory until error.
 
   Accepts `limitMB` as a query parameter to set the amount of memory to leak (default is no limit, ie until OOM)
+
+## Build
+
+![Build](https://github.com/autotraderuk/chaos-kraken/workflows/Build/badge.svg?branch=master)
+
+### Standalone
+
+As the project is based on Gradle and SpringBoot, you can get started quickly by running:
+
+```shell script
+./gradlew bootRun 
+```
+
+The app will be available at http://localhost:8080
+
+Alternatively to build an executable JAR run:
+
+```shell script
+./gradlew build
+```
+
+### Docker
+
+A [`Dockerfile`](Dockerfile) is provided to demonstrate how you may containerise the app for deployment to a platform such as Kubernetes. 
+A [`docker-compose.yaml`](docker-compose.yml) file is also provided for convenience.  
+
+To build the image you can run:
+
+```shell script
+docker-compose build
+```
+
+To spin up the app locally run the following:
+
+```shell script
+docker-compose up
+``` 
