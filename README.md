@@ -14,11 +14,14 @@ Chaos Kraken is actively used within Auto Trader to verify various behaviours of
 
 A [GitHub package](https://github.com/autotraderuk/chaos-kraken/packages/143034 containing the executable JAR for Chaos Kraken is created every time a new release is created using a [GitHub Actions workflow](.github/workflows/publish-release.yaml). 
 
-Once you've downloaded the JAR file simply run it. 
+Once you've downloaded the JAR file simply run it, for example:
 
 ```
 java -jar chaos-kraken-0.1.2.jar
 ```
+
+![Alt text](./chaos-kraken-usage.svg)
+<img src="./chaos-kraken-usage.svg">
 
 ## Build
 
