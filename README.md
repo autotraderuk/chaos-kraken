@@ -16,7 +16,7 @@ A [GitHub package](https://github.com/autotraderuk/chaos-kraken/packages/143034)
 
 Once you've downloaded the JAR file simply run it, for example:
 
-```
+```shell script
 java -jar chaos-kraken-0.1.2.jar
 ```
 
@@ -31,10 +31,16 @@ java -jar chaos-kraken-0.1.2.jar
 As the project is based on Gradle and SpringBoot, you can get started quickly by running:
 
 ```shell script
-./gradlew clean bootRun 
+./gradlew bootRun 
 ```
 
 The app will be available at http://localhost:8080
+
+Alternatively to build an executable JAR run:
+
+```shell script
+./gradlew build
+```
 
 ### Docker
 
