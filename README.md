@@ -10,6 +10,16 @@ As Auto Trader started their migration to public cloud and Kubernetes, the Chaos
 
 Chaos Kraken is actively used within Auto Trader to verify various behaviours of their [GKE](https://cloud.google.com/kubernetes-engine) based delivery platform. 
 
+## Usage
+
+A [GitHub package](https://github.com/autotraderuk/chaos-kraken/packages/143034 containing the executable JAR for Chaos Kraken is created every time a new release is created using a [GitHub Actions workflow](.github/workflows/publish-release.yaml). 
+
+Once you've downloaded the JAR file simply run it. 
+
+```
+java -jar chaos-kraken-0.1.2.jar
+```
+
 ## Build
 
 ![Build](https://github.com/autotraderuk/chaos-kraken/workflows/Build/badge.svg?branch=master)
