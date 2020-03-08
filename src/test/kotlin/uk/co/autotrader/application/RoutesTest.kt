@@ -14,9 +14,9 @@ import org.springframework.test.web.reactive.server.expectBody
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class RoutesShould(@LocalServerPort val randomServerPort: Int, @Qualifier("custom") val customFailure: CustomFailure) {
+class DefaultRouteShould(@LocalServerPort val randomServerPort: Int) {
 
-    var webClient = WebTestClient
+    val webClient = WebTestClient
             .bindToServer()
             .baseUrl("http://localhost:$randomServerPort")
             .build()
@@ -28,9 +28,18 @@ class RoutesShould(@LocalServerPort val randomServerPort: Int, @Qualifier("custo
                 .expectStatus().isOk
                 .expectBody<String>().isEqualTo("This kraken is running and ready to cause some chaos.")
     }
+}
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class SimulateRouteShould(@LocalServerPort val randomServerPort: Int, @Qualifier("custom") val customFailure: CustomFailure) {
+
+    val webClient = WebTestClient
+            .bindToServer()
+            .baseUrl("http://localhost:$randomServerPort")
+            .build()
 
     @Test
-    fun `return bad request for unknown failure`() {
+    fun `respond with bad request for unknown failure`() {
         webClient.post().uri("/simulate/unknown")
                 .exchange()
                 .expectStatus().isBadRequest
@@ -39,11 +48,13 @@ class RoutesShould(@LocalServerPort val randomServerPort: Int, @Qualifier("custo
 
     @Test
     fun `toggle health to service unavailable`() {
-        webClient.post().uri("/simulate/toggle-service-health")
+        webClient.post()
+                .uri("/simulate/toggle-service-health")
                 .exchange()
                 .expectStatus().isOk
 
-        webClient.get().uri("/actuator/health")
+        webClient.get()
+                .uri("/actuator/health")
                 .exchange()
                 .expectStatus().isEqualTo(HttpStatus.SERVICE_UNAVAILABLE)
     }
@@ -52,11 +63,42 @@ class RoutesShould(@LocalServerPort val randomServerPort: Int, @Qualifier("custo
     fun `delegate to specific failure type`() {
         val expectedParams = mapOf(Pair("key1", "value1"), Pair("key2", "value2"))
 
-        webClient.post().uri("/simulate/custom?key1=value1&key2=value2")
+        webClient.post()
+                .uri("/simulate/custom?key1=value1&key2=value2")
                 .exchange()
                 .expectStatus().isOk
 
         assertThat(customFailure.actualParams, equalTo(expectedParams))
+    }
+}
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class EchoStatusRouteShould(@LocalServerPort val randomServerPort: Int) {
+
+    val webClient = WebTestClient
+            .bindToServer()
+            .baseUrl("http://localhost:$randomServerPort")
+            .build()
+
+    @Test
+    fun `respond with provided valid status code`() {
+        webClient.get().uri("/echostatus/418")
+                .exchange()
+                .expectStatus().isEqualTo(HttpStatus.I_AM_A_TEAPOT)
+    }
+
+    @Test
+    fun `respond with bad request for invalid status code`() {
+        webClient.get().uri("/echostatus/999")
+                .exchange()
+                .expectStatus().isBadRequest
+    }
+
+    @Test
+    fun `respond with bad request non-numeric status code`() {
+        webClient.get().uri("/echostatus/sdfsdf")
+                .exchange()
+                .expectStatus().isBadRequest
     }
 }
 

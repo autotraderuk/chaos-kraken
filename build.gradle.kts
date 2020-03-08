@@ -26,7 +26,6 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     runtimeOnly("org.springframework.boot:spring-boot-devtools")
-    runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("com.natpryce:hamkrest:1.7.0.0")
