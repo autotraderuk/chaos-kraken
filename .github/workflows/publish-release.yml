@@ -1,8 +1,9 @@
 name: Publish release
-
 on:
-  release:
-    types: [published]
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+    - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
   publish-release:
@@ -20,7 +21,6 @@ jobs:
       - name: Publish artifact
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
         # The GITHUB_REF tag comes in the format 'refs/tags/xxx'.
         # So if we split on '/' and take the 3rd value, we can get the release name.
         run: |
@@ -28,3 +28,23 @@ jobs:
           echo "New version: ${NEW_VERSION}"
           echo "Github username: ${GITHUB_ACTOR}"
           ./gradlew -Pversion=${NEW_VERSION} publish
+          
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+          
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./build/libs/chaos-kraken-${{ github.ref }}.jar
+          asset_name: chaos-kraken${{ github.ref }}.jar
+          asset_content_type: application/jar
