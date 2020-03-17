@@ -19,7 +19,6 @@ import java.util.stream.Collectors
 import java.util.stream.IntStream
 import java.util.stream.Stream
 import kotlin.concurrent.timer
-import kotlin.system.exitProcess
 
 interface Failure {
     fun fail(params: Map<String, String> = emptyMap())
@@ -223,11 +222,11 @@ class FileWriter : Failure {
 }
 
 @Component("killapp")
-class KillApp : Failure {
+class KillApp(val systemExit: SystemExit) : Failure {
 
     override fun fail(params: Map<String, String>) {
         LOG.error("Application was killed by calling the 'killapp' failure")
-        exitProcess(1)
+        systemExit.exitProcess(1)
     }
 }
 

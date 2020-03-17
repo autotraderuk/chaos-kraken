@@ -3,6 +3,7 @@ package uk.co.autotrader.application
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.context.annotation.Bean
 import javax.annotation.PostConstruct
 
 @SpringBootApplication
@@ -20,3 +21,4 @@ constructor(private val failureSimulator: FailureSimulator) {
 fun main(args: Array<String>) {
     runApplication<Application>(*args)
 }
+

@@ -3,9 +3,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("org.springframework.boot") version "2.2.5.RELEASE"
     id("io.spring.dependency-management") version "1.0.9.RELEASE"
+    id("org.asciidoctor.convert") version "1.5.9.2"
+    id("maven-publish")
     kotlin("jvm") version "1.3.61"
     kotlin("plugin.spring") version "1.3.61"
-    id("maven-publish")
 }
 
 java {
@@ -24,22 +25,43 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.apache.commons:commons-lang3:3.4")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-
     runtimeOnly("org.springframework.boot:spring-boot-devtools")
+    asciidoctor("org.springframework.restdocs:spring-restdocs-asciidoctor")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("com.natpryce:hamkrest:1.7.0.0")
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+    testImplementation("org.springframework.restdocs:spring-restdocs-webtestclient")
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
+val snippetsDir by extra { file("build/generated-snippets") }
 
 tasks.withType<KotlinCompile>() {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
         jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+}
+
+tasks {
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
+        outputs.dir(snippetsDir)
+    }
+
+    asciidoctor {
+        inputs.dir(snippetsDir)
+        dependsOn(test)
+    }
+
+    bootJar {
+        dependsOn(asciidoctor)
+        into("static/docs") {
+            from("build/asciidoc/html5")
+        }
     }
 }
 

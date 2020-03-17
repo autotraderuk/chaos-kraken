@@ -1,6 +1,6 @@
 # Chaos Kraken
 
-Application to simulate JVM based failure scenarios when running on a delivery platform.
+An application that can be used to simulate JVM based failure scenarios when running on a delivery platform.
 
 > Terrorise the Shipp'ng lanes with the Chaos Kraken, an incomplete FAAS (Failures as a Service).  
 
