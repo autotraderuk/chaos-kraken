@@ -1,0 +1,70 @@
+= Chaos Kraken
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+
+An application that can be used to simulate JVM based failure scenarios when running on a delivery platform.
+
+ Terrorise the Shipp'ng lanes with the Chaos Kraken, an incomplete FAAS (Failures as a Service).
+
+The first version of Chaos Kraken was created at https://careers.autotrader.co.uk/[Auto Trader UK] back in 2017. It was
+originally built to test various application failure conditions on their private cloud infrastructure.
+
+As Auto Trader started their migration to public cloud and Kubernetes, the Chaos Kraken evolved to cater for more
+failure modes.
+
+Chaos Kraken is actively used within Auto Trader to verify various behaviours of their
+https://cloud.google.com/kubernetes-engine[GKE] based delivery platform.
+
+== Getting Started
+
+A https://github.com/autotraderuk/chaos-kraken/packages/143034[GitHub package] containing the executable JAR for Chaos
+Kraken is created every time a version is released using a
+https://github.com/autotraderuk/chaos-kraken/actions?query=workflow%3A%22Publish+release%22[GitHub Actions workflow].
+
+The application JAR can be downloaded from here, or you can clone the repo and build it yourself.
+
+=== Building
+
+Chaos Kraken uses https://gradle.org/[Gradle] for dependency management and other build time concerns. It also uses the
+https://docs.gradle.org/current/userguide/gradle_wrapper.html[Gradle Wrapper] allowing you to simply clone the repo and
+build the project with minimal effort.
+
+....
+./gradlew build
+....
+
+This will create an executable Spring Boot JAR providing all the features of the Chaos Kraken, as well as these docs
+hosted at `/docs/index.html`.
+
+=== Running
+
+Once you've downloaded or built the application JAR simply run it, for example:
+
+....
+java -jar chaos-kraken-0.1.2.jar
+....
+
+By default, the application will then be available on port `8080`.
+
+You can verify this from your terminal:
+
+include::{snippets}/welcome/curl-request.adoc[]
+
+Which will give you the following response:
+
+include::{snippets}/welcome/http-response.adoc[]
+
+== Simulating behaviours
+
+Chaos Kraken provides a variety of behaviours that simulate ways in which an application may behave badly, or even fail,
+whilst running on a delivery platform.
+
+=== killapp
+
+The `killapp` behaviour simulates the JVM process dying by exiting the process.
+
+include::{snippets}/killapp/curl-request.adoc[]
+
+

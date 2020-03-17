@@ -1,46 +1,80 @@
 package uk.co.autotrader.application
 
-import com.natpryce.hamkrest.assertion.assertThat
-import com.natpryce.hamkrest.equalTo
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.Mockito.*
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.web.server.LocalServerPort
+import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.restdocs.RestDocumentationContextProvider
+import org.springframework.restdocs.RestDocumentationExtension
+import org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint
+import org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document
+import org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
+import java.net.URI
+import java.nio.charset.Charset
 
-
+@ExtendWith(SpringExtension::class, RestDocumentationExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class DefaultRouteShould(@LocalServerPort val randomServerPort: Int) {
+class DefaultRouteShould(private val context: ApplicationContext) {
 
-    val webClient = WebTestClient
-            .bindToServer()
-            .baseUrl("http://localhost:$randomServerPort")
-            .build()
+    private lateinit var webTestClient: WebTestClient
+
+    @BeforeEach
+    fun setup(restDocumentation: RestDocumentationContextProvider) {
+        this.webTestClient = webTestClient(context, restDocumentation)
+    }
 
     @Test
     fun `return a welcome message`() {
-        webClient.get()
+        webTestClient
+                .get()
+                .uri("/")
                 .exchange()
                 .expectStatus().isOk
-                .expectBody<String>().isEqualTo("This kraken is running and ready to cause some chaos.")
+                .expectHeader().contentType(MediaType.TEXT_HTML)
+                .expectBody()
+                .consumeWith { exchangeResult ->
+                    val body = exchangeResult.responseBody!!.toString(Charset.forName("UTF-8"))
+                    assertThat(body).contains("This kraken is running and ready to cause some chaos.")
+                    assertThat(body).contains("Read the <a href=\"docs/index.html\">docs</a>.")
+                }
+                .consumeWith(document("welcome"))
+
     }
 }
 
+@ExtendWith(SpringExtension::class, RestDocumentationExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class SimulateRouteShould(@LocalServerPort val randomServerPort: Int, @Qualifier("custom") val customFailure: CustomFailure) {
+class SimulateRouteShould(
+        private val context: ApplicationContext,
+        @LocalServerPort val randomServerPort: Int,
+        @Qualifier("custom") val customFailure: CustomFailure) {
 
-    val webClient = WebTestClient
-            .bindToServer()
-            .baseUrl("http://localhost:$randomServerPort")
-            .build()
+    @MockBean
+    lateinit var systemExit: SystemExit
+
+    private lateinit var webTestClient: WebTestClient
+
+    @BeforeEach
+    fun setup(restDocumentation: RestDocumentationContextProvider) {
+        this.webTestClient = webTestClient(context, restDocumentation)
+    }
 
     @Test
     fun `respond with bad request for unknown failure`() {
-        webClient.post().uri("/simulate/unknown")
+        webTestClient.post().uri("/simulate/unknown")
                 .exchange()
                 .expectStatus().isBadRequest
                 .expectBody<String>().isEqualTo("Unrecognised failure. Failed at failing this service.")
@@ -48,13 +82,13 @@ class SimulateRouteShould(@LocalServerPort val randomServerPort: Int, @Qualifier
 
     @Test
     fun `toggle health to service unavailable`() {
-        webClient.post()
+        webTestClient.post()
                 .uri("/simulate/toggle-service-health")
                 .exchange()
                 .expectStatus().isOk
 
-        webClient.get()
-                .uri("/actuator/health")
+        webTestClient.get()
+                .uri(URI("http://localhost:${randomServerPort}/actuator/health"))
                 .exchange()
                 .expectStatus().isEqualTo(HttpStatus.SERVICE_UNAVAILABLE)
     }
@@ -63,43 +97,73 @@ class SimulateRouteShould(@LocalServerPort val randomServerPort: Int, @Qualifier
     fun `delegate to specific failure type`() {
         val expectedParams = mapOf(Pair("key1", "value1"), Pair("key2", "value2"))
 
-        webClient.post()
+        webTestClient.post()
                 .uri("/simulate/custom?key1=value1&key2=value2")
                 .exchange()
                 .expectStatus().isOk
 
-        assertThat(customFailure.actualParams, equalTo(expectedParams))
+        assertThat(customFailure.actualParams).isEqualTo(expectedParams)
+    }
+
+    @Test
+    fun `trigger killapp failure`() {
+        webTestClient.post()
+                .uri("/simulate/killapp")
+                .exchange()
+                .expectStatus().isOk
+                .expectBody()
+                .consumeWith { exchangeResult ->
+                    assertThat(exchangeResult.status).isEqualTo(HttpStatus.OK)
+                }
+                .consumeWith(document("killapp"))
+
+        verify(systemExit, times(1)).exitProcess(1)
     }
 }
 
+@ExtendWith(SpringExtension::class, RestDocumentationExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class EchoStatusRouteShould(@LocalServerPort val randomServerPort: Int) {
+class EchoStatusRouteShould(private val context: ApplicationContext) {
 
-    val webClient = WebTestClient
-            .bindToServer()
-            .baseUrl("http://localhost:$randomServerPort")
-            .build()
+    private lateinit var webTestClient: WebTestClient
+
+    @BeforeEach
+    fun setup(restDocumentation: RestDocumentationContextProvider) {
+        this.webTestClient = webTestClient(context, restDocumentation)
+    }
 
     @Test
     fun `respond with provided valid status code`() {
-        webClient.get().uri("/echostatus/418")
+        webTestClient.get().uri("/echostatus/418")
                 .exchange()
                 .expectStatus().isEqualTo(HttpStatus.I_AM_A_TEAPOT)
     }
 
     @Test
     fun `respond with bad request for invalid status code`() {
-        webClient.get().uri("/echostatus/999")
+        webTestClient.get().uri("/echostatus/999")
                 .exchange()
                 .expectStatus().isBadRequest
     }
 
     @Test
     fun `respond with bad request non-numeric status code`() {
-        webClient.get().uri("/echostatus/sdfsdf")
+        webTestClient.get().uri("/echostatus/sdfsdf")
                 .exchange()
                 .expectStatus().isBadRequest
     }
+}
+
+fun webTestClient(context: ApplicationContext, restDocumentation: RestDocumentationContextProvider): WebTestClient {
+    return WebTestClient
+            .bindToApplicationContext(context)
+            .configureClient()
+            .filter(documentationConfiguration(restDocumentation)
+                    .operationPreprocessors()
+                    .withRequestDefaults(prettyPrint())
+                    .withResponseDefaults(prettyPrint())
+            )
+            .build()
 }
 
 class CustomFailure : Failure {
@@ -113,7 +177,7 @@ class CustomFailure : Failure {
 @Configuration
 class TestConfig {
     @Bean("custom")
-    fun customFailure(): Failure {
+    fun custom(): Failure {
         return CustomFailure()
     }
 }
