@@ -73,14 +73,13 @@ publishing {
     }
 
     repositories {
-//        maven {
-//            name = "GitHubPackages"
-//            url = uri("https://maven.pkg.github.com/autotraderuk/chaos-kraken")
-//            credentials {
-//                username = System.getenv("GITHUB_ACTOR")
-//                password = System.getenv("GITHUB_TOKEN")
-//            }
-//        }
-        mavenLocal()
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/autotraderuk/chaos-kraken")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 }
