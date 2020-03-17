@@ -1,5 +1,7 @@
 # Chaos Kraken
 
+![Build](https://github.com/autotraderuk/chaos-kraken/workflows/Build/badge.svg) ![Publish release](https://github.com/autotraderuk/chaos-kraken/workflows/Publish%20release/badge.svg)
+
 An application that can be used to simulate JVM based failure scenarios when running on a delivery platform.
 
 > Terrorise the Shipp'ng lanes with the Chaos Kraken, an incomplete FAAS (Failures as a Service).  
