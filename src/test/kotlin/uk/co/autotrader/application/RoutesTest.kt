@@ -117,7 +117,7 @@ class SimulateRouteShould(
                 }
                 .consumeWith(document("killapp"))
 
-        verify(systemExit, times(1)).exitProcess(1)
+        verify(systemExit, times(1)).exit(1)
     }
 }
 

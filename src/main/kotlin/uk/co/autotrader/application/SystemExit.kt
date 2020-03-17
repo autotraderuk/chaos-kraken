@@ -1,14 +1,15 @@
 package uk.co.autotrader.application
 
 import org.springframework.stereotype.Component
+import kotlin.system.exitProcess
 
 interface SystemExit {
-    fun exitProcess(status: Int)
+    fun exit(status: Int)
 }
 
 @Component
 class SystemExitImpl : SystemExit {
-    override fun exitProcess(status: Int) {
+    override fun exit(status: Int) {
         exitProcess(status)
     }
 }

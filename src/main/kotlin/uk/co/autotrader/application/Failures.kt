@@ -226,7 +226,7 @@ class KillApp(val systemExit: SystemExit) : Failure {
 
     override fun fail(params: Map<String, String>) {
         LOG.error("Application was killed by calling the 'killapp' failure")
-        systemExit.exitProcess(1)
+        systemExit.exit(1)
     }
 }
 
