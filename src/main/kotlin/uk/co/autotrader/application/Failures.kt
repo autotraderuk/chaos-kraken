@@ -3,7 +3,7 @@ package uk.co.autotrader.application
 import org.apache.commons.lang3.RandomUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import uk.co.autotrader.application.WriteRandomBytesToFile.writeRandomBytesToFile
+import uk.co.autotrader.application.FileWriter.writeRandomBytes
 import java.io.*
 import java.net.ServerSocket
 import java.net.Socket
@@ -18,6 +18,7 @@ import java.util.*
 import java.util.stream.Collectors
 import java.util.stream.IntStream
 import java.util.stream.Stream
+import kotlin.collections.ArrayList
 import kotlin.concurrent.timer
 
 interface Failure {
@@ -43,7 +44,6 @@ class FailureSimulator(private val failures: Map<String, Failure>) {
         }
         return false
     }
-
 }
 
 @Component("toggle-service-health")
@@ -67,10 +67,10 @@ class MemoryLeak : Failure {
 
         while (true) {
             try {
-                allocatedMemory.add(ByteArray(1000))
+                allocatedMemory.add(ByteArray(ONE_KB))
             } catch (outOfMemory: OutOfMemoryError) {
+                LOG.debug("Swallowing OOM")
             }
-
         }
     }
 }
@@ -81,7 +81,7 @@ class MemoryLeakOom : Failure {
         val allocatedMemory = ArrayList<ByteArray>()
 
         while (true) {
-            allocatedMemory.add(ByteArray(1000))
+            allocatedMemory.add(ByteArray(ONE_KB))
         }
     }
 }
@@ -92,21 +92,14 @@ class WasteCpu : Failure {
     override fun fail(params: Map<String, String>) {
         IntStream.range(0, Runtime.getRuntime().availableProcessors())
                 .forEach { _ -> Thread(Runnable { this.hashRandomBytes() }).start() }
-
     }
 
     private fun hashRandomBytes() {
         while (true) {
-            try {
-                val digest = MessageDigest.getInstance("MD5")
-                digest.update(UUID.randomUUID().toString().toByteArray())
-            } catch (e: NoSuchAlgorithmException) {
-                throw RuntimeException(e)
-            }
-
+            val digest = MessageDigest.getInstance("MD5")
+            digest.update(UUID.randomUUID().toString().toByteArray())
         }
     }
-
 }
 
 @Component("threadbomb")
@@ -120,24 +113,24 @@ class ThreadBomb : Failure {
     }
 }
 
-object WriteRandomBytesToFile {
+object FileWriter {
 
     @Throws(IOException::class)
-    fun writeRandomBytesToFile(file: File, size: Int) {
+    fun writeRandomBytes(file: File, size: Int) {
         BufferedOutputStream(FileOutputStream(file)).use { output ->
             var i = 0
             while (i < size) {
                 output.write(RandomUtils.nextBytes(1))
-                i = i + 1
+                i += 1
             }
         }
     }
 }
 
+private const val ONE_GB = 1024 * 1024 * 1024
+
 @Component("diskbomb")
 class DiskBomb : Failure {
-
-    private val GIGABYTE = 1024 * 1024 * 1024
 
     override fun fail(params: Map<String, String>) {
         val directoryPaths = listAllDirectories()
@@ -147,10 +140,9 @@ class DiskBomb : Failure {
                 val randomFile = findRandomElement(directoryPaths)
                         .resolve(UUID.randomUUID().toString() + ".disk-bomb.run")
                         .toFile()
-                writeRandomBytesToFile(randomFile, GIGABYTE)
+                writeRandomBytes(randomFile, ONE_GB)
             } catch (ignored: IOException) {
             }
-
         }
     }
 
@@ -166,13 +158,8 @@ class DiskBomb : Failure {
     }
 
     private fun listAllSubDirectories(root: Path): Stream<Path> {
-        try {
-            return Files.walk(root)
-                    .filter { path -> path.toFile().isDirectory }
-        } catch (e: IOException) {
-            throw RuntimeException(e)
-        }
-
+        return Files.walk(root)
+                .filter { path -> path.toFile().isDirectory }
     }
 }
 
@@ -181,7 +168,9 @@ class StandardOutBomb : Failure {
     override fun fail(params: Map<String, String>) {
         timer(
                 period = params["periodMillis"]?.toLongOrNull() ?: 1L,
-                action = { println("Standard Out Bomb: " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)) }
+                action = {
+                    println("Standard Out Bomb: " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                }
         )
     }
 }
@@ -198,27 +187,24 @@ class FileHandleBomb : Failure {
                 readers.add(fileReader)
             } catch (ignored: IOException) {
             }
-
         }
     }
 }
 
-@Component("filewriter")
-class FileWriter : Failure {
+private const val ONE_KB = 1_024
 
-    private val KILOBYTE = 1024
+@Component("filecreator")
+class FileCreator : Failure {
 
     override fun fail(params: Map<String, String>) {
         while (true) {
             try {
-                val tempFile = File.createTempFile(UUID.randomUUID().toString(), ".file-writer.run")
-                writeRandomBytesToFile(tempFile, KILOBYTE)
+                val tempFile = File.createTempFile(UUID.randomUUID().toString(), ".file-creator.run")
+                writeRandomBytes(tempFile, ONE_KB)
             } catch (ignored: IOException) {
             }
-
         }
     }
-
 }
 
 @Component("killapp")
@@ -230,9 +216,10 @@ class KillApp(val systemExit: SystemExit) : Failure {
     }
 }
 
+private const val CONNECTIONS = 5000
+
 @Component("selfconnectionsbomb")
 class SelfConnectionsBomb : Failure {
-    private val CONNECTIONS = 5000
 
     override fun fail(params: Map<String, String>) {
         val openConnections = ArrayList<Socket>()
@@ -260,7 +247,6 @@ class SelfConnectionsBomb : Failure {
                 socket.close()
             } catch (ignored: IOException) {
             }
-
         }
     }
 }
@@ -269,10 +255,15 @@ class SelfConnectionsBomb : Failure {
 class DirectMemoryLeak : Failure {
     override fun fail(params: Map<String, String>) {
         val allocatedMemory = ArrayList<ByteBuffer>()
-        val check = params["limitMB"]?.toIntOrNull()?.let { limit -> { limit > allocatedMemory.size } } ?: { true }
+        val check =
+                params["limitMB"]?.toIntOrNull()?.let { limit ->
+                    {
+                        limit > allocatedMemory.size
+                    }
+                } ?: { true }
 
         while (check.invoke()) {
-            allocatedMemory.add(ByteBuffer.allocateDirect(1024 * 1024))
+            allocatedMemory.add(ByteBuffer.allocateDirect(ONE_KB * ONE_KB))
         }
     }
 }

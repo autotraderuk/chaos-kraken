@@ -5,6 +5,7 @@ plugins {
     id("io.spring.dependency-management") version "1.0.9.RELEASE"
     id("org.asciidoctor.convert") version "1.5.9.2"
     id("maven-publish")
+    id("io.gitlab.arturbosch.detekt").version("1.9.1")
     kotlin("jvm") version "1.3.61"
     kotlin("plugin.spring") version "1.3.61"
 }
@@ -82,4 +83,9 @@ publishing {
             }
         }
     }
+}
+
+detekt {
+    config = files("detekt-config.yml")
+    buildUponDefaultConfig = true
 }

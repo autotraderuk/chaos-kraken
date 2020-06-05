@@ -42,20 +42,22 @@ class FailureHandler(private val failureSimulator: FailureSimulator) {
 
     fun processFailure(request: ServerRequest): Mono<ServerResponse> {
 
-        return if (failureSimulator.run(request.pathVariable("failureType"), request.queryParams().toSingleValueMap())) {
+        return if (failureSimulator.run(
+                        request.pathVariable("failureType"),
+                        request.queryParams().toSingleValueMap())
+        ) {
             ServerResponse.ok().build()
         } else {
             ServerResponse.badRequest().bodyValue("Unrecognised failure. Failed at failing this service.")
         }
-
     }
-
 }
 
 @Component
 class EchoStatusHandler {
     private val log = LoggerFactory.getLogger(EchoStatusHandler::class.java)
 
+    @Suppress("TooGenericExceptionCaught")
     fun responseStatus(request: ServerRequest): Mono<ServerResponse> {
         val responseHttpStatus = try {
             val requestHttpStatus = request.pathVariable("status").toInt()
@@ -73,5 +75,3 @@ class EchoStatusHandler {
         return ServerResponse.status(responseHttpStatus).build()
     }
 }
-
-

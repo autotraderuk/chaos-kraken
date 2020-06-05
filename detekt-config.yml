@@ -1,0 +1,6 @@
+formatting:
+  NoWildcardImports:
+    active: false
+style:
+  WildcardImport:
+    excludeImports: ['java.io.*', 'java.util.*', 'kotlinx.android.synthetic.*']

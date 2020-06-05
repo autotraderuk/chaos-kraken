@@ -76,9 +76,9 @@ curl http://localhost:8080/echostatus/403
 
   Start opening random new files and never closing them.
 
-- `filewriter`
+- `filecreator`
 
-  Start writing random 1KB files to `java.io.tmpdir`.
+  Start creating random 1KB files in `java.io.tmpdir`.
 
 - `stdoutbomb`
 
