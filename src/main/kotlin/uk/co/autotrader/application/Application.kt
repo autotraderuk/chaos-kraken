@@ -17,8 +17,7 @@ constructor(private val failureSimulator: FailureSimulator) {
         failureSimulator.run(failureType)
     }
 }
-
+@Suppress("SpreadOperator")
 fun main(args: Array<String>) {
     runApplication<Application>(*args)
 }
-
