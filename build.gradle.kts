@@ -37,7 +37,7 @@ dependencies {
 
 val snippetsDir by extra { file("build/generated-snippets") }
 
-tasks.withType<KotlinCompile>() {
+tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
         jvmTarget = JavaVersion.VERSION_1_8.toString()
