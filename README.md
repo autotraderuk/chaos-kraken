@@ -140,3 +140,9 @@ To spin up the app locally run the following:
 ```shell script
 docker-compose up
 ``` 
+
+## Release
+
+To release a new version you simply push a new tag. The Publish Release action will then build, package and publish the artifacts. 
+
+NOTE: You'll need push access for the main repo to push the tag.
