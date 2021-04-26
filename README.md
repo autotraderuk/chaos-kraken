@@ -145,4 +145,11 @@ docker-compose up
 
 To release a new version you simply push a new tag. The Publish Release action will then build, package and publish the artifacts. 
 
+For example:
+
+```
+$ git tag v0.2.9
+$ git push --tags
+```
+
 NOTE: You'll need push access for the main repo to push the tag.
