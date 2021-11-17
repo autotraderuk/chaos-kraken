@@ -5,7 +5,7 @@ plugins {
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     kotlin("jvm") version "1.5.31"
     kotlin("plugin.spring") version "1.5.31"
-    id("org.asciidoctor.convert") version "1.5.9.2"
+    id("org.asciidoctor.convert") version "2.4.0"
     id("io.gitlab.arturbosch.detekt").version("1.9.1")
     id("maven-publish")
 }
